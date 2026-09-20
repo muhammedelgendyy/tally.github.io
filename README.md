@@ -8,7 +8,9 @@
 6. First launch: create your username and password.
 
 ## Updating later
-Upload the changed files, then change `VER = 'tally-v1'` in `sw.js` to `'tally-v2'` so phones pick up the new version.
+Upload the changed files (`index.html` and `sw.js` for this version). From now on the app always loads the newest files when you are online, and reloads itself once when a new version arrives. To confirm which version a phone is running, open **Settings** and look at the bottom: it should say *Tally version 4*.
+
+If the phone still shows an older version once, fully close the app (swipe it away) and open it again.
 
 ## Good to know
 - Data is stored **only on the device where you use the app**, encrypted with your password. There is no password reset. Use Settings > Export backup regularly (iOS can clear website storage in rare cases).
@@ -22,3 +24,12 @@ Upload the changed files, then change `VER = 'tally-v1'` in `sw.js` to `'tally-v
 - Keys are saved encrypted inside your vault on the device. They are never put in the repo. Paste them into the app only.
 - If no key works, the app falls back to the free on-device reader.
 - Get keys at https://aistudio.google.com/apikey
+
+## Dashboard widgets (new in version 4)
+- Pick a period with the chips: Today, Yesterday, 7 days, 30 days, Month, Year, All time or Custom.
+- Widgets: Summary, Income vs spending, Where the money went, Top spending, Day cards. Tap **Widgets** (top right of the Dashboard) to show, hide and reorder them.
+- Tap a summary number to enlarge it. Tap a doughnut slice or legend chip to inspect it, then **See merchants** to drill down. Tap or drag on the line chart to inspect a day, then **View transactions**. Tap a day card to open that day in the Ledger.
+
+## Smart tagging and bank SMS
+- Tally learns which tag you choose for a store and suggests it next time (Settings > Smart tagging shows how many it has learned). It also recognises common UAE and Egypt stores.
+- In the + screen, **Paste a bank SMS** reads the amount, merchant, date, currency and type from the message. It was ported from the Feloosy Feen parser, so it is tuned to those message formats. Always check the result before saving.
