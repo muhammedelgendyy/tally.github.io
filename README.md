@@ -15,3 +15,10 @@ Upload the changed files, then change `VER = 'tally-v1'` in `sw.js` to `'tally-v
 - Laptop dashboard: export a backup on the iPhone, open the site on the laptop, choose "Import a backup instead", pick the file and enter your password.
 - Receipt scanning needs internet the first time (it downloads the OCR engine and language data), and it is only as accurate as the photo. Always review the items before saving.
 - Live exchange rates come from open.er-api.com (free, no key). Type a rate manually in Settings to override it.
+
+## Receipt scanning with Gemini
+- In the app go to **Settings > Receipt scanning**, paste your API keys (one per line, 3 to 5 is fine) and tap **Test keys**.
+- Scans try the keys in order until one works and remember the winner. If a key is rejected or out of quota, the next one is used automatically. Within a key, several Gemini models are tried in turn.
+- Keys are saved encrypted inside your vault on the device. They are never put in the repo. Paste them into the app only.
+- If no key works, the app falls back to the free on-device reader.
+- Get keys at https://aistudio.google.com/apikey

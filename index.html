@@ -37,7 +37,7 @@ try{var t=localStorage.getItem('tally.theme');if(t==='dark'||t==='light')documen
   --inc:#4CC79B; --exp:#F0708F; --acc:#F2B33D; --acc-ink:#241800; color-scheme:dark;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink)}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink)}
 body{font-family:'Schibsted Grotesk','Noto Sans Arabic',system-ui,-apple-system,'Segoe UI',sans-serif;font-size:16px;line-height:1.35;-webkit-text-size-adjust:100%;overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
@@ -45,10 +45,11 @@ button{cursor:pointer}
 .wrap{max-width:720px;margin:0 auto}
 
 /* ---------- top bar & tab bar ---------- */
-.topbar{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(env(safe-area-inset-top) + 12px) 18px 8px}
+#app{position:fixed;inset:0;display:flex;flex-direction:column}
+.topbar{flex:none;position:relative;z-index:5;background:var(--bg);padding:calc(env(safe-area-inset-top) + 12px) 18px 8px}
 .topbar h1{margin:0;font-size:30px;font-weight:700;letter-spacing:-.02em}
-main{padding:4px 14px calc(env(safe-area-inset-bottom) + 100px)}
-.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+main{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:4px 14px 32px}
+.tabbar{flex:none;position:relative;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
 .tabbar nav{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);align-items:end;height:58px}
 .tab{background:none;border:0;display:grid;justify-items:center;gap:2px;padding:6px 0 4px;font-size:11px;color:var(--muted);font-weight:500}
 .tab svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -153,8 +154,8 @@ main{padding:4px 14px calc(env(safe-area-inset-bottom) + 100px)}
 .swatches button.on{border-color:var(--ink)}
 
 /* ---------- auth ---------- */
-#auth{min-height:100dvh;display:grid;align-content:center;padding:calc(env(safe-area-inset-top) + 24px) 22px 40px}
-#auth .box{max-width:380px;margin:0 auto;width:100%;display:grid;gap:12px}
+#auth{position:fixed;inset:0;overflow-y:auto;display:flex;padding:calc(env(safe-area-inset-top) + 24px) 22px 40px}
+#auth .box{max-width:380px;margin:auto;width:100%;display:grid;gap:12px}
 #auth h1{font-size:40px;letter-spacing:-.03em;margin:0}
 #auth p{margin:0;color:var(--muted)}
 .err{color:var(--exp);font-size:14px;min-height:1.2em}
@@ -185,6 +186,61 @@ main{padding:4px 14px calc(env(safe-area-inset-bottom) + 100px)}
 #busy div{background:var(--surface);padding:22px 26px;border-radius:14px;font-weight:600;max-width:80%;text-align:center}
 #toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 84px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;z-index:50;opacity:0;pointer-events:none;transition:opacity .2s;max-width:88%;text-align:center}
 #toast.show{opacity:1}
+
+/* ---------- motion ---------- */
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes fadeout{to{opacity:0}}
+@keyframes rowin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes rise{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.22) translateY(-2px)}100%{transform:scale(1)}}
+@keyframes flash{0%{background:color-mix(in srgb,var(--acc) 45%,transparent)}100%{background:transparent}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes drop{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes down{to{transform:translateY(60px);opacity:.3}}
+/* screen change: one orchestrated entrance */
+#view.enter{animation:fadein .22s ease-out}
+.enter .row,.enter .receipt{animation:rowin .38s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*35ms)}
+.row.flash,.receipt.flash{animation:flash 1.6s ease-out}
+.enter .rank .r{animation:rowin .4s cubic-bezier(.2,.7,.2,1) both}
+.enter .rank .r:nth-child(2){animation-delay:.04s}.enter .rank .r:nth-child(3){animation-delay:.08s}
+.enter .rank .r:nth-child(4){animation-delay:.12s}.enter .rank .r:nth-child(5){animation-delay:.16s}
+.enter .rank .r:nth-child(n+6){animation-delay:.2s}
+.enter .rank .bar i{transform-origin:left;animation:grow .7s cubic-bezier(.2,.7,.2,1) .1s both}
+.enter svg rect{transform-box:fill-box;transform-origin:50% 100%;animation:rise .6s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*16ms + .1s)}
+svg polyline{stroke-dasharray:1}
+.enter svg polyline{animation:draw 1s ease-out .15s both}
+.enter svg circle{animation:fadein .3s ease-out .9s both}
+/* touch feedback */
+.tab svg,.tab.add span.fab{transition:transform .15s}
+.tab:active svg{transform:scale(.86)}
+.tab.add:active .fab{transform:scale(.92)}
+.tab.on svg{animation:pop .38s ease-out}
+.btn,.row,.iconbtn,.set-row{transition:transform .12s,background-color .15s}
+.btn:active,.iconbtn:active{transform:scale(.96)}
+.row:active,.set-row:active{background:var(--soft)}
+.seg button{transition:background-color .2s,color .2s,box-shadow .2s}
+/* sheets, toast, busy */
+#sheetHost.open{animation:fadein .2s ease-out}
+#sheetHost.closing{animation:fadeout .2s ease-in forwards}
+#sheetHost.closing .sheet{animation:down .2s ease-in forwards}
+.sheet.noanim{animation:none}
+.irow.in-new{animation:drop .3s cubic-bezier(.2,.7,.2,1)}
+#toast{transform:translate(-50%,12px);transition:opacity .2s,transform .25s cubic-bezier(.2,.7,.2,1)}
+#toast.show{transform:translate(-50%,0)}
+#busy.open{animation:fadein .15s}
+.spin{display:block;width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+/* gemini settings */
+textarea.in{resize:none;display:block}
+.keys{font-family:ui-monospace,Menlo,monospace;font-size:14px;-webkit-text-security:disc}
+.keys.show{-webkit-text-security:none}
+.kres{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;background:var(--surface);animation:drop .3s both}
+.kres+.kres{border-top:1px solid var(--line)}
+.kres em{font-style:normal;font-size:13px;font-weight:600;text-align:right}
+.kres em.ok{color:var(--inc)}.kres em.no{color:var(--exp)}.kres em.wait{color:var(--muted)}
+.hint{font-size:13px;color:var(--muted);margin:8px 4px 0}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
@@ -204,7 +260,7 @@ main{padding:4px 14px calc(env(safe-area-inset-bottom) + 100px)}
 </div>
 
 <div id="sheetHost"></div>
-<div id="busy"><div id="busyText">Working…</div></div>
+<div id="busy"><div><i class="spin"></i><span id="busyText">Working…</span></div></div>
 <div id="toast" role="status"></div>
 
 <script>
@@ -367,7 +423,7 @@ function sumMonth(ym,type){return state.tx.filter(t=>t.type===type&&t.date.start
 const ui={tab:'ledger',month:nowYm(),view:'overall',q:'',tag:'',range:'month',dMonth:nowYm(),dYear:new Date().getFullYear(),cvAmt:'100',cvFrom:'AED'};
 let form=null;
 
-function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2600);}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),Math.max(2600,String(msg).length*55));}
 const showBusy=m=>{$('#busyText').textContent=m;$('#busy').classList.add('open');};
 const hideBusy=()=>$('#busy').classList.remove('open');
 
@@ -494,19 +550,32 @@ const ago=ts=>{if(!ts)return 'never';const m=Math.round((Date.now()-ts)/60000);i
 function startApp(){
   $('#auth').hidden=true;$('#auth').innerHTML='';
   $('#app').hidden=false;
-  render();
+  state.settings.gemini=state.settings.gemini||{keys:[],model:'',last:null};
+  render(true);
   refreshRates(false);
 }
-function render(){
+function render(animate){
   const t=ui.tab;
   $('#pageTitle').textContent={ledger:'Ledger',dash:'Dashboard',convert:'Convert',settings:'Settings'}[t];
   $('#view').innerHTML=t==='ledger'?renderLedger():t==='dash'?renderDash():t==='convert'?renderConvert():renderSettings();
   $$('.tab[data-tab]').forEach(b=>{b.classList.toggle('on',b.dataset.tab===t);});
+  if(animate){const v=$('#view');v.classList.remove('enter');void v.offsetWidth;v.classList.add('enter');clearTimeout(render.t);render.t=setTimeout(()=>v.classList.remove('enter'),1500);}
 }
 
 /* ---------- sheet host ---------- */
-function openSheet(html){const h=$('#sheetHost');h.innerHTML=html;h.classList.add('open');document.body.style.overflow='hidden';}
-function closeSheet(){const h=$('#sheetHost');h.classList.remove('open');h.innerHTML='';document.body.style.overflow='';form=null;}
+function openSheet(html){
+  const h=$('#sheetHost');clearTimeout(closeSheet.t);
+  const was=h.classList.contains('open')&&!h.classList.contains('closing');
+  h.classList.remove('closing');h.innerHTML=html;
+  if(was){const s=$('.sheet',h);if(s)s.classList.add('noanim');}
+  h.classList.add('open');document.body.style.overflow='hidden';
+}
+function closeSheet(){
+  const h=$('#sheetHost');form=null;document.body.style.overflow='';
+  if(!h.classList.contains('open'))return;
+  h.classList.add('closing');clearTimeout(closeSheet.t);
+  closeSheet.t=setTimeout(()=>{h.classList.remove('open','closing');h.innerHTML='';},200);
+}
 $('#sheetHost').addEventListener('click',e=>{if(e.target.id==='sheetHost'&&!form)closeSheet();});
 
 /* =====================================================================
@@ -527,7 +596,9 @@ function renderLedger(){
   </div>
   <div id="ledgerBody">${ledgerBody()}</div>`;
 }
+let rowN=0;
 function ledgerBody(){
+  rowN=0;
   const list=state.tx.filter(t=>t.date.startsWith(ui.month)).filter(matchesFilter)
     .sort((a,b)=>b.date.localeCompare(a.date)||(b.created||0)-(a.created||0));
   const sp=list.filter(t=>t.type==='expense').reduce((s,t)=>s+inBase(t,t.total),0);
@@ -550,14 +621,14 @@ function rowHTML(t){
   const tg=tagOf(t.tagId),n=(t.items||[]).length;
   if(ui.view==='detailed'&&t.type==='expense'&&n){
     const items=allocations(t);
-    return `<div class="receipt" data-act="edit" data-id="${t.id}" role="button" tabindex="0">
+    return `<div class="receipt${t.id===ui.flash?' flash':''}" style="--i:${Math.min(rowN++,14)}" data-act="edit" data-id="${t.id}" role="button" tabindex="0">
       <div class="rhead"><span class="rt" dir="auto">${esc(t.title)}</span><span class="ramt exp"><span class="a1">${money(t.total,t.currency)}</span></span></div>
       <div class="tree">${items.map(i=>{const g=tagOf(i.tagId);return `<div class="li${i.rest?' rest':''}"><span class="ln"><span dir="auto">${esc(i.name)}</span><small><i class="dot" style="background:${g.color}"></i>${esc(g.name)}</small></span><span class="lead"></span><span class="la">${money(i.amount,t.currency)}</span></div>`;}).join('')}</div>
     </div>`;
   }
   const sign=t.type==='income'?'+':'−';
   const sub=[tg.name,n?n+' items':''].filter(Boolean).join(', ');
-  return `<button class="row" data-act="edit" data-id="${t.id}"><i class="dot" style="background:${tg.color}"></i>
+  return `<button class="row${t.id===ui.flash?' flash':''}" style="--i:${Math.min(rowN++,14)}" data-act="edit" data-id="${t.id}"><i class="dot" style="background:${tg.color}"></i>
     <span class="rmain"><span class="rt" dir="auto">${esc(t.title)}</span><span class="rs">${esc(sub)}</span></span>
     <span class="ramt ${t.type==='income'?'inc':''}"><span class="a1">${sign}${money(t.total,t.currency)}</span>${t.currency!==base()?`<small>${nf.format(inBase(t,t.total))} ${base()}</small>`:''}</span></button>`;
 }
@@ -574,7 +645,7 @@ function svgBars(buckets,{h=150,bw=22,gap=6,color='var(--ink)',vals=false}={}){
   let s=`<svg viewBox="0 0 ${W} ${h}" style="width:100%" role="img" aria-label="Bar chart"><line x1="0" y1="${bs}" x2="${W}" y2="${bs}" class="axl"/>`;
   buckets.forEach((b,i)=>{
     const x=gap+i*(bw+gap),bh=Math.round(b.v/max*(bs-top));
-    s+=`<rect x="${x}" y="${bs-bh}" width="${bw}" height="${b.v>0?Math.max(bh,2):0}" rx="2" fill="${color}"><title>${esc(b.t||b.l)}: ${nf.format(b.v)}</title></rect>`;
+    s+=`<rect style="--i:${i}" x="${x}" y="${bs-bh}" width="${bw}" height="${b.v>0?Math.max(bh,2):0}" rx="2" fill="${color}"><title>${esc(b.t||b.l)}: ${nf.format(b.v)}</title></rect>`;
     if(vals&&b.v>0)s+=`<text x="${x+bw/2}" y="${bs-bh-4}" text-anchor="middle" class="axv">${short(b.v)}</text>`;
     if(b.l!=='')s+=`<text x="${x+bw/2}" y="${h-6}" text-anchor="middle" class="axt">${b.l}</text>`;
   });
@@ -585,8 +656,8 @@ function svgPairs(buckets,{h=160,bw=16,gap=14}={}){
   let s=`<svg viewBox="0 0 ${W} ${h}" style="width:100%" role="img" aria-label="Income versus spending"><line x1="0" y1="${bs}" x2="${W}" y2="${bs}" class="axl"/>`;
   buckets.forEach((b,i)=>{
     const x=gap/2+i*(bw*2+gap)+gap/2,ha=Math.round(b.a/max*(bs-top)),hb=Math.round(b.b/max*(bs-top));
-    s+=`<rect x="${x}" y="${bs-ha}" width="${bw}" height="${b.a>0?Math.max(ha,2):0}" rx="2" fill="var(--inc)"><title>${esc(b.t)} income: ${nf.format(b.a)}</title></rect>`;
-    s+=`<rect x="${x+bw}" y="${bs-hb}" width="${bw}" height="${b.b>0?Math.max(hb,2):0}" rx="2" fill="var(--exp)"><title>${esc(b.t)} spending: ${nf.format(b.b)}</title></rect>`;
+    s+=`<rect style="--i:${i}" x="${x}" y="${bs-ha}" width="${bw}" height="${b.a>0?Math.max(ha,2):0}" rx="2" fill="var(--inc)"><title>${esc(b.t)} income: ${nf.format(b.a)}</title></rect>`;
+    s+=`<rect style="--i:${i}" x="${x+bw}" y="${bs-hb}" width="${bw}" height="${b.b>0?Math.max(hb,2):0}" rx="2" fill="var(--exp)"><title>${esc(b.t)} spending: ${nf.format(b.b)}</title></rect>`;
     s+=`<text x="${x+bw}" y="${h-6}" text-anchor="middle" class="axt">${b.l}</text>`;
   });
   return s+'</svg>';
@@ -597,7 +668,7 @@ function svgLine(vals,labels){
   const avg=vals.reduce((s,v)=>s+v,0)/n;
   let s=`<svg viewBox="0 0 ${W} ${h}" style="width:100%" role="img" aria-label="Spending trend"><line x1="0" y1="${bs}" x2="${W}" y2="${bs}" class="axl"/>`;
   s+=`<line x1="0" y1="${py(avg)}" x2="${W}" y2="${py(avg)}" stroke="var(--muted)" stroke-dasharray="4 4" stroke-width="1"/><text x="${W-2}" y="${py(avg)-4}" text-anchor="end" class="axv">avg ${short(avg)}</text>`;
-  s+=`<polyline fill="none" stroke="var(--exp)" stroke-width="2.2" stroke-linejoin="round" points="${vals.map((v,i)=>px(i)+','+py(v)).join(' ')}"/>`;
+  s+=`<polyline pathLength="1" fill="none" stroke="var(--exp)" stroke-width="2.2" stroke-linejoin="round" points="${vals.map((v,i)=>px(i)+','+py(v)).join(' ')}"/>`;
   vals.forEach((v,i)=>{s+=`<circle cx="${px(i)}" cy="${py(v)}" r="3" fill="var(--exp)"><title>${esc(labels[i])}: ${nf.format(v)}</title></circle>`;if(i%2===0||n<7)s+=`<text x="${px(i)}" y="${h-6}" text-anchor="middle" class="axt">${labels[i]}</text>`;});
   return s+'</svg>';
 }
@@ -683,6 +754,14 @@ function renderSettings(){
     <div class="set-row"><span>Default currency</span><select class="in" data-set="base">${CURS.map(c=>`<option ${c===s.base?'selected':''}>${c}</option>`).join('')}</select></div>
     ${rateRow('AED')}${rateRow('EGP')}
     <div class="set-row"><span class="muted">Live rates updated ${ago(s.ratesAt)}</span><button class="btn sm" data-act="refreshRates">Refresh</button></div></div></div>
+  <div class="set-sec"><h3>Receipt scanning (Gemini)</h3>
+    <textarea class="in keys" id="gemKeys" data-gem="keys" rows="4" placeholder="Paste your API keys here, one per line" autocapitalize="none" autocorrect="off" spellcheck="false" aria-label="Gemini API keys">${esc(gemKeys().join('\n'))}</textarea>
+    <div class="panel" style="margin-top:8px">
+      <div class="set-row"><span>Model <span class="muted">(optional)</span></span><input class="in" style="width:200px" data-gem="model" placeholder="${GEM_MODELS[0]}" value="${esc(gem().model)}" autocapitalize="none" autocorrect="off" spellcheck="false"></div>
+      <div class="set-row"><span class="muted" id="gemCount">${gemKeys().length} key${gemKeys().length===1?'':'s'} saved</span><span style="display:flex;gap:8px"><button class="btn sm" data-act="toggleKeys">Show</button><button class="btn sm pri" data-act="testKeys">Test keys</button></span></div>
+    </div>
+    <div class="panel" id="gemOut" style="margin-top:8px"></div>
+    <p class="hint">Scans try each key in turn until one works, then remember it. Keys stay encrypted on this device. The receipt photo is sent to Google to be read, and on the free tier Google may use it to improve its products.</p></div>
   <div class="set-sec"><h3>Appearance</h3><div class="seg" role="group" aria-label="Theme">${['system','light','dark'].map(t=>`<button data-act="setTheme" data-v="${t}" class="${theme===t?'on':''}">${t[0].toUpperCase()+t.slice(1)}</button>`).join('')}</div></div>
   <div class="set-sec"><h3>Tags</h3><div class="panel">
     ${state.tags.map(t=>`<button class="set-row" data-act="editTag" data-id="${t.id}"><span style="display:flex;align-items:center;gap:10px"><i class="dot" style="background:${t.color}"></i>${esc(t.name)}</span><span class="muted">${t.kind}</span></button>`).join('')}
@@ -752,19 +831,19 @@ function openForm(id){
 }
 const tagOptions=(kind,sel)=>state.tags.filter(t=>t.kind===kind).map(t=>`<option value="${t.id}" ${t.id===sel?'selected':''}>${esc(t.name)}</option>`).join('');
 function renderForm(){
-  const f=form,exp=f.type==='expense',prev=$('.sh-body');const st=prev?prev.scrollTop:0;
+  const f=form,exp=f.type==='expense',hasG=gemKeys().length>0,prev=$('.sh-body');const st=prev?prev.scrollTop:0;
   const ocr=localStorage.getItem('tally.ocr')||'eng+ara';
   openSheet(`<div class="sheet"><div class="sh-head"><button class="cancel" data-act="closeSheet">Cancel</button><b>${f.id?'Edit':'New'} ${f.type}</b><button class="save" data-act="saveForm">Save</button></div>
   <div class="sh-body">
     <div class="seg" style="margin-top:10px" role="group" aria-label="Type"><button data-act="setType" data-v="expense" class="${exp?'on':''}">Expense</button><button data-act="setType" data-v="income" class="${exp?'':'on'}">Income</button></div>
-    ${exp?`<div class="fld"><span class="lbl">Receipt photo</span><div class="two-col" style="grid-template-columns:1fr 1fr"><label class="btn block" style="text-align:center">Scan a receipt<input type="file" accept="image/*" data-scan hidden></label><select class="in" data-ocr aria-label="Receipt language"><option value="eng+ara" ${ocr==='eng+ara'?'selected':''}>English + Arabic</option><option value="eng" ${ocr==='eng'?'selected':''}>English only</option><option value="ara" ${ocr==='ara'?'selected':''}>Arabic only</option></select></div></div>`:''}
+    ${exp?`<div class="fld"><span class="lbl">Receipt photo</span><div class="two-col" style="grid-template-columns:${hasG?'1fr':'1fr 1fr'}"><label class="btn block" style="text-align:center">${hasG?'Scan a receipt with Gemini':'Scan a receipt'}<input type="file" accept="image/*" data-scan hidden></label>${hasG?'':`<select class="in" data-ocr aria-label="Receipt language"><option value="eng+ara" ${ocr==='eng+ara'?'selected':''}>English + Arabic</option><option value="eng" ${ocr==='eng'?'selected':''}>English only</option><option value="ara" ${ocr==='ara'?'selected':''}>Arabic only</option></select>`}</div>${hasG?'':`<div class="sumnote">Add Gemini API keys in Settings for much better reading of receipts.</div>`}</div>`:''}
     <div class="fld"><label for="f_title">${exp?'Store or merchant':'Source'}</label><input class="in" id="f_title" data-bind="title" dir="auto" placeholder="${exp?'e.g. LuLu Hypermarket':'e.g. Salary'}" value="${esc(f.title)}"></div>
     <div class="two-col"><div class="fld"><label for="f_date">Date</label><input class="in" type="date" id="f_date" data-bind="date" value="${f.date}"></div>
     <div class="fld"><label for="f_cur">Currency</label><select class="in" id="f_cur" data-bind="currency">${CURS.map(c=>`<option ${c===f.currency?'selected':''}>${c}</option>`).join('')}</select></div></div>
     <div class="two-col"><div class="fld"><label for="f_total">${exp?'Receipt total':'Amount'}</label><input class="in num" id="f_total" data-bind="total" inputmode="decimal" placeholder="0.00" value="${esc(f.total)}"></div>
     <div class="fld"><label for="f_tag">${exp?'Tag':'Category'}</label><select class="in" id="f_tag" data-bind="tagId">${tagOptions(f.type,f.tagId)}</select></div></div>
     ${exp?`<div class="fld" style="margin-bottom:0"><span class="lbl">Items on this receipt (optional)</span></div>
-    <div id="itemRows">${f.items.map((it,i)=>`<div class="irow"><input class="in" data-bind="name" data-i="${i}" dir="auto" placeholder="Item, e.g. Sugar" value="${esc(it.name)}"><input class="in num" data-bind="amount" data-i="${i}" inputmode="decimal" placeholder="0.00" value="${esc(it.amount)}"><div class="sub"><select class="in" data-bind="tagId" data-i="${i}" aria-label="Item tag">${tagOptions('expense',it.tagId)}</select><button class="x" data-act="rmItem" data-i="${i}" aria-label="Remove item">×</button></div></div>`).join('')}</div>
+    <div id="itemRows">${f.items.map((it,i)=>`<div class="irow${it._new?' in-new':''}"><input class="in" data-bind="name" data-i="${i}" dir="auto" placeholder="Item, e.g. Sugar" value="${esc(it.name)}"><input class="in num" data-bind="amount" data-i="${i}" inputmode="decimal" placeholder="0.00" value="${esc(it.amount)}"><div class="sub"><select class="in" data-bind="tagId" data-i="${i}" aria-label="Item tag">${tagOptions('expense',it.tagId)}</select><button class="x" data-act="rmItem" data-i="${i}" aria-label="Remove item">×</button></div></div>`).join('')}</div>
     <div class="sumnote" id="sumNote"></div>
     <button class="btn block" data-act="addItem">Add an item</button>`:''}
     <div class="fld"><label for="f_note">Note (optional)</label><input class="in" id="f_note" data-bind="note" dir="auto" value="${esc(f.note)}"></div>
@@ -772,6 +851,7 @@ function renderForm(){
     ${f.id?`<button class="btn danger block" data-act="delTx" style="margin-top:20px">Delete this ${f.type}</button>`:''}
   </div></div>`);
   const nb=$('.sh-body');if(nb)nb.scrollTop=st;
+  f.items.forEach(i=>{delete i._new;});
   updateSum();
 }
 function updateSum(){
@@ -800,8 +880,8 @@ async function saveForm(){
     fx:(old&&old.currency===f.currency)?old.fx:{...state.settings.rates},created:f.created||Date.now()};
   if(old)state.tx[state.tx.indexOf(old)]=tx;else state.tx.push(tx);
   await save();
-  ui.month=tx.date.slice(0,7);
-  closeSheet();ui.tab='ledger';render();toast('Saved');
+  ui.month=tx.date.slice(0,7);ui.flash=tx.id;setTimeout(()=>{ui.flash=null;},2200);
+  closeSheet();ui.tab='ledger';render(true);toast('Saved');
 }
 async function delTx(){
   if(!confirm('Delete this transaction?'))return;
@@ -809,13 +889,20 @@ async function delTx(){
   await save();closeSheet();render();
 }
 
-/* ---------- receipt scanning (free, on-device OCR) ---------- */
+/* ---------- receipt scanning: Gemini first, on-device OCR as fallback ---------- */
 function loadScript(src){return new Promise((res,rej)=>{if(window.Tesseract)return res();const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('Could not load the reader. Check your internet connection and try again.'));document.head.appendChild(s);});}
+async function loadBitmap(file){
+  try{return await createImageBitmap(file,{imageOrientation:'from-image'});}
+  catch{return await new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>rej(new Error('Could not open that photo.'));im.src=URL.createObjectURL(file);});}
+}
+async function fileToJpegB64(file,max){
+  const bmp=await loadBitmap(file),w0=bmp.width||bmp.naturalWidth,h0=bmp.height||bmp.naturalHeight,sc=Math.min(1,max/Math.max(w0,h0));
+  const c=document.createElement('canvas');c.width=Math.round(w0*sc);c.height=Math.round(h0*sc);
+  c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+  return c.toDataURL('image/jpeg',0.85).split(',')[1];
+}
 async function preprocess(file){
-  let bmp;
-  try{bmp=await createImageBitmap(file,{imageOrientation:'from-image'});}
-  catch{bmp=await new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>rej(new Error('Could not open that photo.'));im.src=URL.createObjectURL(file);});}
-  const w0=bmp.width||bmp.naturalWidth,h0=bmp.height||bmp.naturalHeight,sc=Math.min(1,2200/Math.max(w0,h0));
+  const bmp=await loadBitmap(file),w0=bmp.width||bmp.naturalWidth,h0=bmp.height||bmp.naturalHeight,sc=Math.min(1,2200/Math.max(w0,h0));
   const c=document.createElement('canvas');c.width=Math.round(w0*sc);c.height=Math.round(h0*sc);
   const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(bmp,0,0,c.width,c.height);
   const d=x.getImageData(0,0,c.width,c.height),p=d.data;
@@ -823,30 +910,150 @@ async function preprocess(file){
   x.putImageData(d,0,0);
   return c;
 }
-async function handleScan(file){
-  const lang=localStorage.getItem('tally.ocr')||'eng+ara';
+
+/* --- Gemini --- */
+const GEM_MODELS=['gemini-3.8-flash','gemini-3.5-flash','gemini-2.5-flash','gemini-3.5-flash-lite'];
+const gem=()=>state.settings.gemini||(state.settings.gemini={keys:[],model:'',last:null});
+const gemKeys=()=>state?gem().keys.filter(Boolean):[];
+const maskKey=k=>'…'+k.slice(-4);
+const gemModels=()=>[...new Set([gem().model.trim(),...GEM_MODELS].filter(Boolean))];
+const GEM_WHY={badkey:'key rejected',denied:'access denied',quota:'quota used up',nomodel:'model unavailable',server:'Google error',other:'request failed'};
+async function gemCall(k,model,parts,json){
+  let r;
   try{
-    showBusy('Preparing photo…');
-    const canvas=await preprocess(file);
-    showBusy('Loading the reader…');
-    await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
-    const worker=await Tesseract.createWorker(lang,1,{logger:m=>{
-      if(m.status==='recognizing text')showBusy('Reading receipt… '+Math.round(m.progress*100)+'%');
-      else if(/loading/.test(m.status))showBusy('Loading language data (first time only)…');
-    }});
-    const {data}=await worker.recognize(canvas);
-    await worker.terminate();
-    const r=parseReceipt(data.text);
-    if(!form)return;
-    if(!form.title&&r.title)form.title=r.title;
-    if(r.date)form.date=r.date;
-    if(r.currency)form.currency=r.currency;
-    if(r.total!=null&&!form.total)form.total=r.total.toFixed(2);
-    const fresh=r.items.map(i=>({id:uid(),name:i.name,amount:i.amount.toFixed(2),tagId:form.tagId}));
-    form.items=form.items.filter(i=>i.name||i.amount).concat(fresh);
-    renderForm();
-    toast(fresh.length?`Found ${fresh.length} item${fresh.length>1?'s':''}. Check them before saving.`:'No items found. Add them by hand.');
-  }catch(e){toast(e.message||'Could not read that receipt.');}
+    r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{
+      method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':k},
+      body:JSON.stringify({contents:[{parts}],generationConfig:json?{responseMimeType:'application/json',temperature:0}:{temperature:0}})});
+  }catch{return {ok:false,kind:'network'};}
+  let j=null;try{j=await r.json();}catch{}
+  if(r.ok){
+    const ps=(j&&j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts)||[];
+    return {ok:true,text:ps.map(p=>p.text||'').join('')};
+  }
+  const raw=JSON.stringify(j||{}),st=j&&j.error&&j.error.status;
+  let kind='other';
+  if(/API_KEY_INVALID|api key not valid|api key expired|api key not found/i.test(raw))kind='badkey';
+  else if(r.status===429||st==='RESOURCE_EXHAUSTED')kind='quota';
+  else if(r.status===403||st==='PERMISSION_DENIED')kind='denied';
+  else if(r.status===404||st==='NOT_FOUND')kind='nomodel';
+  else if(r.status>=500)kind='server';
+  return {ok:false,kind,status:r.status};
+}
+function extractJSON(t){
+  const s=String(t||'').replace(/```(?:json)?/gi,'');
+  const a=s.indexOf('{'),b=s.lastIndexOf('}');
+  if(a<0||b<a)return null;
+  try{return JSON.parse(s.slice(a,b+1));}catch{return null;}
+}
+function receiptPrompt(tagNames){
+  return `You read shopping receipts. The photo may be in English, Arabic, or both.
+Return ONLY JSON in this shape:
+{"merchant":string,"date":"YYYY-MM-DD" or "","currency":"AED" or "EGP" or "USD" or "","total":number,"items":[{"name":string,"amount":number,"tag":string}]}
+Rules:
+- merchant: the store name as printed.
+- date: the purchase date. Receipts here are usually day/month/year. Use "" if it is not visible.
+- currency: only if printed or obvious, otherwise "".
+- total: the final amount paid including VAT, not the subtotal.
+- items: one entry per purchased product. name = the product name in the language printed (fix obvious misprints). amount = the line total for that product (quantity x unit price) as printed, after any line discount. Never include subtotal, VAT or tax, rounding, payment, change, card or loyalty lines.
+- Use Western digits and a dot as the decimal separator.
+- tag: the best match from this list, written exactly as here: ${JSON.stringify(tagNames)}
+- Do not invent items. Leave out anything unreadable.`;
+}
+function normalizeGemini(d){
+  const num=v=>{const n=typeof v==='number'?v:parseAmt(v);return isFinite(n)?n:NaN;};
+  const items=(Array.isArray(d.items)?d.items:[]).map(i=>({name:String((i&&i.name)||'').trim().slice(0,80),amount:num(i&&(i.amount??i.total)),tagName:String((i&&i.tag)||'')})).filter(i=>i.name&&i.amount>0);
+  const t=num(d.total),cur=String(d.currency||'').toUpperCase(),dt=String(d.date||'');
+  return {
+    title:String(d.merchant||'').trim().slice(0,60),
+    date:/^\d{4}-\d{2}-\d{2}$/.test(dt)&&+dt.slice(0,4)>=2000&&+dt.slice(0,4)<=2100?dt:'',
+    currency:CURS.includes(cur)?cur:'',
+    total:t>0?t:(items.length?round2(items.reduce((s,i)=>s+i.amount,0)):null),
+    items
+  };
+}
+async function geminiScan(file){
+  const all=gemKeys(),last=gem().last;
+  const order=[...all.filter(k=>last&&k===last.k),...all.filter(k=>!(last&&k===last.k))];
+  const b64=await fileToJpegB64(file,1600);
+  const names=state.tags.filter(t=>t.kind==='expense').map(t=>t.name);
+  const parts=[{text:receiptPrompt(names)},{inlineData:{mimeType:'image/jpeg',data:b64}}];
+  const problems=[];
+  for(let ki=0;ki<order.length;ki++){
+    const k=order[ki],base_=gemModels();
+    const ms=(last&&k===last.k&&base_.includes(last.m))?[last.m,...base_.filter(m=>m!==last.m)]:base_;
+    for(const m of ms){
+      showBusy(`Reading receipt with Gemini… (key ${ki+1} of ${order.length})`);
+      const r=await gemCall(k,m,parts,true);
+      if(r.ok){
+        const data=extractJSON(r.text);
+        if(data){gem().last={k,m};save();return normalizeGemini(data);}
+        problems.push(`${maskKey(k)}: unreadable answer`);continue;
+      }
+      if(r.kind==='network')throw new Error('Could not reach Gemini. Check your internet connection.');
+      problems.push(`${maskKey(k)} ${GEM_WHY[r.kind]}`);
+      if(r.kind==='badkey'||r.kind==='denied')break;
+    }
+  }
+  throw new Error(`None of your ${order.length} Gemini key${order.length===1?'':'s'} worked (${[...new Set(problems)].slice(-3).join(', ')}).`);
+}
+async function testKeys(){
+  const keys=gemKeys(),out=$('#gemOut');
+  if(!keys.length){toast('Paste at least one API key first');return;}
+  out.innerHTML=keys.map((k,i)=>`<div class="kres"><span>${maskKey(k)}</span><em class="wait" id="kr${i}">waiting</em></div>`).join('');
+  let firstOk=null;
+  for(let i=0;i<keys.length;i++){
+    const el=$('#kr'+i);el.textContent='testing…';
+    let done=false,why='';
+    for(const m of gemModels()){
+      const r=await gemCall(keys[i],m,[{text:'Reply with the single word OK.'}],false);
+      if(r.ok){el.className='ok';el.textContent='Works with '+m;done=true;if(!firstOk)firstOk={k:keys[i],m};break;}
+      if(r.kind==='network'){el.className='no';el.textContent='No connection';return;}
+      why=GEM_WHY[r.kind];
+      if(r.kind==='badkey'||r.kind==='denied')break;
+    }
+    if(!done){el.className='no';el.textContent=why||'Failed';}
+  }
+  if(firstOk){gem().last=firstOk;await save();toast('Ready: '+maskKey(firstOk.k)+' will be used first');}
+  else toast('None of the keys worked');
+}
+
+/* --- on-device fallback --- */
+async function tesseractScan(file){
+  const lang=localStorage.getItem('tally.ocr')||'eng+ara';
+  showBusy('Preparing photo…');
+  const canvas=await preprocess(file);
+  showBusy('Loading the reader…');
+  await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
+  const worker=await Tesseract.createWorker(lang,1,{logger:m=>{
+    if(m.status==='recognizing text')showBusy('Reading receipt… '+Math.round(m.progress*100)+'%');
+    else if(/loading/.test(m.status))showBusy('Loading language data (first time only)…');
+  }});
+  const {data}=await worker.recognize(canvas);
+  await worker.terminate();
+  return parseReceipt(data.text);
+}
+function applyScan(r,note){
+  if(!form)return;
+  if(!form.title&&r.title)form.title=r.title;
+  if(r.date)form.date=r.date;
+  if(r.currency)form.currency=r.currency;
+  if(r.total!=null&&!form.total)form.total=Number(r.total).toFixed(2);
+  const byName=new Map(state.tags.filter(t=>t.kind==='expense').map(t=>[t.name.toLowerCase(),t.id]));
+  const fresh=r.items.map(i=>({id:uid(),name:i.name,amount:Number(i.amount).toFixed(2),tagId:byName.get(String(i.tagName||'').toLowerCase())||form.tagId,_new:true}));
+  form.items=form.items.filter(i=>i.name||i.amount).concat(fresh);
+  renderForm();
+  toast((note?note+' ':'')+(fresh.length?`Found ${fresh.length} item${fresh.length>1?'s':''}. Check them before saving.`:'No items found. Add them by hand.'));
+}
+async function handleScan(file){
+  let r=null,note='';
+  try{
+    if(gemKeys().length){
+      try{showBusy('Preparing photo…');r=await geminiScan(file);}
+      catch(e){note=e.message;}
+    }
+    if(!r){r=await tesseractScan(file);if(note)note='Gemini did not work, so the on-device reader was used.';}
+    applyScan(r,note);
+  }catch(e){toast(((note?note+' ':'')+(note?'':(e.message||'Could not read that receipt.'))).trim());}
   finally{hideBusy();}
 }
 
@@ -855,21 +1062,21 @@ async function handleScan(file){
    ===================================================================== */
 document.addEventListener('click',async e=>{
   const tab=e.target.closest('[data-tab]');
-  if(tab){ui.tab=tab.dataset.tab;render();window.scrollTo(0,0);return;}
+  if(tab){ui.tab=tab.dataset.tab;render(true);$('main').scrollTop=0;return;}
   const a=e.target.closest('[data-act]');if(!a)return;
   const d=a.dataset;
   switch(d.act){
     case 'new':openForm(null);break;
     case 'edit':openForm(d.id);break;
     case 'closeSheet':closeSheet();break;
-    case 'prevM':ui.month=shiftMonth(ui.month,-1);render();break;
-    case 'nextM':ui.month=shiftMonth(ui.month,1);render();break;
-    case 'setView':ui.view=d.v;render();break;
-    case 'setRange':ui.range=d.v;render();break;
-    case 'dPrev':if(ui.range==='month')ui.dMonth=shiftMonth(ui.dMonth,-1);else ui.dYear--;render();break;
-    case 'dNext':if(ui.range==='month')ui.dMonth=shiftMonth(ui.dMonth,1);else ui.dYear++;render();break;
+    case 'prevM':ui.month=shiftMonth(ui.month,-1);render(true);break;
+    case 'nextM':ui.month=shiftMonth(ui.month,1);render(true);break;
+    case 'setView':ui.view=d.v;render(true);break;
+    case 'setRange':ui.range=d.v;render(true);break;
+    case 'dPrev':if(ui.range==='month')ui.dMonth=shiftMonth(ui.dMonth,-1);else ui.dYear--;render(true);break;
+    case 'dNext':if(ui.range==='month')ui.dMonth=shiftMonth(ui.dMonth,1);else ui.dYear++;render(true);break;
     case 'setType':if(form.type!==d.v){form.type=d.v;form.tagId=d.v==='expense'?'other':'salary';if(d.v==='income')form.items=[];renderForm();}break;
-    case 'addItem':form.items.push({id:uid(),name:'',amount:'',tagId:form.type==='expense'?form.tagId:'other'});renderForm();break;
+    case 'addItem':form.items.push({id:uid(),name:'',amount:'',tagId:form.type==='expense'?form.tagId:'other',_new:true});renderForm();break;
     case 'rmItem':form.items.splice(+d.i,1);renderForm();break;
     case 'saveForm':saveForm();break;
     case 'delTx':delTx();break;
@@ -882,6 +1089,8 @@ document.addEventListener('click',async e=>{
     case 'tagColor':window.tagForm.color=d.v;$$('[data-act=tagColor]').forEach(b=>b.classList.toggle('on',b.dataset.v===d.v));break;
     case 'saveTag':saveTag();break;
     case 'delTag':delTag();break;
+    case 'toggleKeys':{const k=$('#gemKeys');k.classList.toggle('show');a.textContent=k.classList.contains('show')?'Hide':'Show';break;}
+    case 'testKeys':testKeys();break;
     case 'exportBackup':exportBackup();break;
     case 'exportCSV':exportCSV();break;
     case 'importSheet':openSheet(`<div class="sheet"><div class="sh-head"><button class="cancel" data-act="closeSheet">Cancel</button><b>Import backup</b><button class="save" data-act="doImport">Import</button></div><div class="sh-body"><p class="muted">This replaces everything on this device with the contents of the backup.</p>${importFormHTML()}<div class="err" id="impErr"></div></div></div>`);break;
@@ -903,9 +1112,14 @@ function onField(e){
   const el=e.target;
   if(el.matches('[data-scan]')){const f=el.files[0];el.value='';if(f)handleScan(f);return;}
   if(el.matches('[data-ocr]')){localStorage.setItem('tally.ocr',el.value);return;}
-  if(el.dataset.filter){ui[el.dataset.filter]=el.value;const b=$('#ledgerBody');if(b)b.innerHTML=ledgerBody();return;}
+  if(el.dataset.filter){ui[el.dataset.filter]=el.value;$('#view').classList.remove('enter');const b=$('#ledgerBody');if(b)b.innerHTML=ledgerBody();return;}
   if(el.dataset.cv){ui[el.dataset.cv==='amt'?'cvAmt':'cvFrom']=el.value;$('#cvOut').innerHTML=convertOut();return;}
   if(el.dataset.rate&&e.type==='change'){const v=parseAmt(el.value);if(v>0){state.settings.rates[el.dataset.rate]=v;state.settings.manual[el.dataset.rate]=true;save();render();}return;}
+  if(el.dataset.gem&&e.type==='change'){
+    if(el.dataset.gem==='keys'){gem().keys=[...new Set(el.value.split(/[\s,;]+/).map(s=>s.trim()).filter(s=>s.length>=20))].slice(0,8);gem().last=null;const n=gem().keys.length;const c=$('#gemCount');if(c)c.textContent=n+' key'+(n===1?'':'s')+' saved';toast(n?n+' key'+(n===1?'':'s')+' saved':'No keys saved');}
+    else gem().model=el.value.trim();
+    save();return;
+  }
   if(el.dataset.set==='base'&&e.type==='change'){state.settings.base=el.value;save();render();return;}
   const b=el.dataset.bind;
   if(b&&form){
