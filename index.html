@@ -9,6 +9,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tally">
+<meta name="format-detection" content="telephone=no">
 <meta name="robots" content="noindex,nofollow">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -24,17 +25,24 @@ try{var t=localStorage.getItem('tally.theme');if(t==='dark'||t==='light')documen
 :root{
   --bg:#E8EDE9; --surface:#F7F9F6; --ink:#13211E; --muted:#5A6B65; --line:#C9D4CD; --soft:#DCE4DE;
   --inc:#17795A; --exp:#B02452; --acc:#E9A31B; --acc-ink:#2A1D00;
+  --raise:#F7F9F6; --edge:transparent; --hotink:#fff; --glow:0; --nav-bg:color-mix(in srgb,var(--surface) 80%,transparent);
+  --nav-border:color-mix(in srgb,var(--line) 70%,transparent);
+  --nav-shadow:0 12px 32px rgba(10,20,17,.2),0 2px 6px rgba(10,20,17,.1);
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --bg:#0D1513; --surface:#15201D; --ink:#E6EEE9; --muted:#8FA19A; --line:#26362F; --soft:#1C2A26;
-    --inc:#4CC79B; --exp:#F0708F; --acc:#F2B33D; --acc-ink:#241800; color-scheme:dark;
+    --bg:#0A100F; --surface:#131C19; --raise:#2A3A35; --ink:#EBF2EE; --muted:#9AABA4; --line:#26342F; --soft:#1B2723;
+    --inc:#5BD9AB; --exp:#FF7E9D; --acc:#F6BC45; --acc-ink:#241800; --edge:rgba(255,255,255,.055); --hotink:#1A0A10; --glow:1;
+    --nav-border:rgba(255,255,255,.09); --nav-shadow:0 14px 34px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06); --nav-bg:color-mix(in srgb,var(--surface) 92%,transparent);
+    color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0D1513; --surface:#15201D; --ink:#E6EEE9; --muted:#8FA19A; --line:#26362F; --soft:#1C2A26;
-  --inc:#4CC79B; --exp:#F0708F; --acc:#F2B33D; --acc-ink:#241800; color-scheme:dark;
+  --bg:#0A100F; --surface:#131C19; --raise:#2A3A35; --ink:#EBF2EE; --muted:#9AABA4; --line:#26342F; --soft:#1B2723;
+  --inc:#5BD9AB; --exp:#FF7E9D; --acc:#F6BC45; --acc-ink:#241800; --edge:rgba(255,255,255,.055); --hotink:#1A0A10; --glow:1;
+  --nav-border:rgba(255,255,255,.09); --nav-shadow:0 14px 34px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06); --nav-bg:color-mix(in srgb,var(--surface) 92%,transparent);
+  color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;background:var(--bg);color:var(--ink)}
@@ -46,12 +54,12 @@ button{cursor:pointer}
 
 /* ---------- top bar & tab bar ---------- */
 #app{position:fixed;inset:0;display:flex;flex-direction:column}
-.topbar{flex:none;position:relative;z-index:5;background:var(--bg);padding:calc(env(safe-area-inset-top) + 12px) 18px 8px}
+.topbar{flex:none;position:relative;z-index:5;background:transparent;padding:calc(env(safe-area-inset-top) + 12px) 18px 8px}
 .topbar h1{margin:0;font-size:30px;font-weight:700;letter-spacing:-.02em}
 main{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:4px 14px calc(env(safe-area-inset-bottom,0px) + 108px)}
 .tabbar{position:absolute;left:0;right:0;bottom:0;z-index:6;display:flex;justify-content:center;padding:0 14px max(calc(env(safe-area-inset-bottom,0px) - 12px),10px);pointer-events:none;transition:transform .45s cubic-bezier(.2,.7,.2,1),opacity .3s}
 .tabbar.away{transform:translateY(calc(100% + 24px));opacity:0}
-.tabbar nav{pointer-events:auto;position:relative;width:100%;max-width:440px;height:64px;display:grid;grid-template-columns:repeat(5,1fr);align-items:stretch;padding:0 4px;border-radius:32px;background:color-mix(in srgb,var(--surface) 80%,transparent);-webkit-backdrop-filter:blur(22px) saturate(1.6);backdrop-filter:blur(22px) saturate(1.6);border:1px solid color-mix(in srgb,var(--line) 70%,transparent);box-shadow:0 12px 32px rgba(10,20,17,.2),0 2px 6px rgba(10,20,17,.1)}
+.tabbar nav{pointer-events:auto;position:relative;width:100%;max-width:440px;height:64px;display:grid;grid-template-columns:repeat(5,1fr);align-items:stretch;padding:0 4px;border-radius:32px;background:var(--nav-bg);-webkit-backdrop-filter:blur(22px) saturate(1.6);backdrop-filter:blur(22px) saturate(1.6);border:1px solid var(--nav-border);box-shadow:var(--nav-shadow)}
 .tab-ind{position:absolute;z-index:0;top:6px;bottom:6px;left:4px;width:calc((100% - 8px)/5);padding:0 3px;transform:translateX(calc(var(--i,0)*100%));transition:transform .45s cubic-bezier(.34,1.3,.64,1)}
 .tab-ind::after{content:"";display:block;height:100%;border-radius:26px;background:var(--soft)}
 .tab{position:relative;z-index:1;background:none;border:0;display:grid;justify-items:center;align-content:center;gap:2px;padding:0;font-size:10.5px;color:var(--muted);font-weight:500}
@@ -77,7 +85,7 @@ main{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;oversc
 .in.num{font-variant-numeric:tabular-nums;text-align:right}
 .seg{display:flex;background:var(--soft);border-radius:10px;padding:3px;gap:2px}
 .seg button{flex:1;border:0;background:none;padding:8px 6px;border-radius:8px;font-weight:600;font-size:14px;color:var(--muted)}
-.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.seg button.on{background:var(--raise);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
 .h2{font-size:17px;font-weight:700;margin:26px 0 8px;letter-spacing:-.01em}
 .empty{padding:36px 12px;text-align:center;color:var(--muted)}
 .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -101,7 +109,7 @@ main{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;oversc
 .dh{display:flex;justify-content:space-between;align-items:baseline;margin:18px 4px 6px;font-size:13px;color:var(--muted);font-weight:600}
 .dh .dt{color:var(--ink);white-space:nowrap;margin-right:10px}
 .dh span:last-child{text-align:right}
-.panel{background:var(--surface);border-radius:12px;overflow:hidden}
+.panel{background:var(--surface);border-radius:12px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--edge)}
 .row{width:100%;display:flex;align-items:center;gap:12px;padding:12px 14px;border:0;background:none;text-align:start}
 .row+.row,.row+.receipt,.receipt+.row{border-top:1px solid var(--line)}
 .rmain{flex:1;min-width:0;display:grid;gap:1px}
@@ -367,6 +375,35 @@ input[type=date].in::-webkit-date-and-time-value{text-align:left;min-height:1.2e
 .welcome h3{margin:0;font-size:22px;letter-spacing:-.02em}
 .welcome p{margin:0;color:var(--muted);max-width:280px}
 .welcome .btn{min-width:220px}
+/* ---------- more widgets ---------- */
+.cal-h{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:5px}
+.cal-h span{text-align:center;font-size:11px;color:var(--muted);font-weight:600}
+.cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cal-d{aspect-ratio:1;border-radius:10px;border:0;padding:0;position:relative;display:grid;place-content:center;justify-items:center;gap:1px;color:var(--ink);background:color-mix(in srgb,var(--exp) var(--a,0%),var(--soft));transition:transform .12s}
+.cal-d:active{transform:scale(.93)}
+.cal-d b{font-size:13px;font-weight:600;line-height:1}
+.cal-d small{font-size:9px;line-height:1;opacity:.85}
+.cal-d.hot{color:var(--hotink)}
+.cal-d.today{outline:2px solid var(--ink);outline-offset:-2px}
+.cal-inc{position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:var(--inc)}
+.cal-e{aspect-ratio:1}
+.cal-key{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--muted)}
+.cal-key i{width:64px;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--soft),var(--exp))}
+.enter .cal-d{animation:fadein .5s ease-out both}
+.wk{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;height:150px}
+.wk-c{display:grid;grid-template-rows:14px 1fr 16px;justify-items:center;gap:4px;min-height:0}
+.wk-b{width:100%;display:flex;align-items:flex-end;min-height:0}
+.wk-b i{display:block;width:100%;border-radius:6px 6px 3px 3px;background:color-mix(in srgb,var(--ink) 24%,var(--soft))}
+.wk-b i.top{background:var(--exp)}
+.wk-v,.wk-l{font-size:11px;color:var(--muted)}
+.enter .wk-b i{transform-origin:bottom;animation:rise .6s cubic-bezier(.2,.7,.2,1) .1s both}
+.cc{font-weight:700;min-width:38px}
+/* ---------- full screen: paint below the visible edge too, and a soft glow in dark mode ---------- */
+html{min-height:-webkit-fill-available}
+body{min-height:100vh;min-height:-webkit-fill-available}
+body::after{content:"";position:fixed;left:0;right:0;top:100%;height:160px;background:var(--bg);pointer-events:none}
+#app::before{content:"";position:absolute;left:0;right:0;top:0;height:320px;background:radial-gradient(90% 100% at 50% 0%,rgba(91,217,171,.15),transparent 70%);pointer-events:none;opacity:var(--glow,0);z-index:0}
+main{position:relative;z-index:1}
 </style>
 </head>
 <body>
@@ -469,7 +506,7 @@ function parseReceipt(raw){
 // </parse>
 
 /* ---------- dates & money ---------- */
-const APP_VER='5';
+const APP_VER='6';
 const CURS=['AED','EGP','USD'];
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MON3=MONTHS.map(m=>m.slice(0,3));
@@ -537,7 +574,7 @@ function defaultState(){
 
 /* ---------- helpers on state ---------- */
 const base=()=>state.settings.base;
-const tagOf=id=>state.tags.find(t=>t.id===id)||{id:'',name:'Untagged',color:'#6B7280',kind:'expense'};
+const tagOf=id=>{const t=state.tags.find(x=>x.id===id)||{id:'',name:'Untagged',color:'#6B7280',kind:'expense'};return isDark()?{...t,color:dkColor(t.color)}:t;};
 const conv=(amt,from,to,fx)=>{fx=fx||state.settings.rates;return amt/fx[from]*fx[to];};
 const inBase=(t,amt)=>conv(amt,t.currency,base(),t.fx);
 function allocations(t){
@@ -571,9 +608,9 @@ function applyTheme(){
   const t=localStorage.getItem('tally.theme')||'system',r=document.documentElement;
   if(t==='system')r.removeAttribute('data-theme');else r.setAttribute('data-theme',t);
   const dark=t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);
-  $('meta[name=theme-color]').content=dark?'#0D1513':'#E8EDE9';
+  $('meta[name=theme-color]').content=dark?'#0A100F':'#E8EDE9';
 }
-matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',applyTheme);
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',()=>{applyTheme();if(state&&!$('#app').hidden)render();});
 
 /* =====================================================================
    AUTH
@@ -895,7 +932,7 @@ const tagKindOf=id=>{const t=state.tags.find(x=>x.id===id);return t&&t.kind;};
 /* =====================================================================
    DASHBOARD (widgets)
    ===================================================================== */
-const WIDGETS={summary:'Summary',budgets:'Budgets',insights:'Insights',line:'Income vs spending',donut:'Where the money went',top:'Top spending',days:'Day cards'};
+const WIDGETS={summary:'Summary',budgets:'Budgets',upcoming:'Coming up',insights:'Insights',line:'Income vs spending',calendar:'Spending calendar',donut:'Where the money went',top:'Top spending',largest:'Largest expenses',weekday:'By weekday',currency:'By currency',days:'Day cards'};
 const PRESETS=[['today','Today'],['yesterday','Yesterday'],['7d','7 days'],['30d','30 days'],['month','Month'],['year','Year'],['all','All time'],['custom','Custom']];
 const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const nf0=new Intl.NumberFormat('en-US',{maximumFractionDigits:0});
@@ -939,12 +976,16 @@ function arcPath(cx,cy,r0,r1,a0,a1){
 
 /* ---------- widget configuration ---------- */
 function dashConf(){
-  const s=state.settings,all=Object.keys(WIDGETS);
-  const d=s.dash||(s.dash={order:[...all],hidden:[]});
-  d.order=d.order.filter(x=>all.includes(x));
-  let at=Math.max(0,d.order.indexOf('summary')+1);
-  all.forEach(k=>{if(!d.order.includes(k))d.order.splice(at++,0,k);});
-  d.hidden=d.hidden.filter(x=>all.includes(x));
+  const s=state.settings;
+  const d=s.dash||(s.dash={order:[...DEFAULT_ORDER],hidden:[]});
+  d.order=d.order.filter(x=>WIDGETS[x]);
+  DEFAULT_ORDER.forEach((k,i)=>{
+    if(d.order.includes(k))return;
+    let at=d.order.length;
+    for(let j=i-1;j>=0;j--){const p=d.order.indexOf(DEFAULT_ORDER[j]);if(p>=0){at=p+1;break;}}
+    d.order.splice(at,0,k);
+  });
+  d.hidden=d.hidden.filter(x=>WIDGETS[x]);
   return d;
 }
 function widgetsSheet(){
@@ -1035,7 +1076,7 @@ function renderDash(){
   DASH={R,P,ex,inc,sp:sumBase(ex),ic:sumBase(inc),B:makeBuckets(R,P),rows:tagRows(ex),sel:null};
   const head=dashHead(R);
   if(!P.length)return head+`<div class="empty">No transactions in this period yet.</div>`;
-  const W={summary:wSummary,budgets:wBudgets,insights:wInsights,line:wLine,donut:wDonut,top:wTop,days:wDays};
+  const W={summary:wSummary,budgets:wBudgets,upcoming:wUpcoming,insights:wInsights,line:wLine,calendar:wCalendar,donut:wDonut,top:wTop,largest:wLargest,weekday:wWeekday,currency:wCurrency,days:wDays};
   const ids=conf.order.filter(id=>!conf.hidden.includes(id));
   return head+(ids.length?`<div class="dgrid">${ids.map(id=>W[id]()).join('')}</div>`:`<div class="empty">All widgets are hidden. Tap Widgets to bring some back.</div>`);
 }
@@ -1113,7 +1154,7 @@ function donutRows(){
   const rows=DASH.rows;
   if(rows.length<=8)return rows.map(r=>({...r}));
   const top=rows.slice(0,7).map(r=>({...r})),rest=rows.slice(7).reduce((s,r)=>s+r.v,0);
-  return [...top,{id:'_o',name:'Others',color:'#6B7280',v:rest}];
+  return [...top,{id:'_o',name:'Others',color:col('#6B7280'),v:rest}];
 }
 function wDonut(){
   const rows=donutRows(),tot=rows.reduce((s,r)=>s+r.v,0);
@@ -1262,7 +1303,7 @@ function renderSettings(){
   <div class="set-sec"><h3>Appearance</h3><div class="seg" role="group" aria-label="Theme">${['system','light','dark'].map(t=>`<button data-act="setTheme" data-v="${t}" class="${theme===t?'on':''}">${t[0].toUpperCase()+t.slice(1)}</button>`).join('')}</div>
     <div class="panel" style="margin-top:10px"><div class="set-row"><span>Hide the bar while scrolling</span><div class="seg mini"><button data-act="setAutoHide" data-v="1" class="${state.settings.autoHide!==false?'on':''}">On</button><button data-act="setAutoHide" data-v="0" class="${state.settings.autoHide===false?'on':''}">Off</button></div></div></div></div>
   <div class="set-sec"><h3>Tags</h3><div class="panel">
-    ${state.tags.map(t=>`<button class="set-row" data-act="editTag" data-id="${t.id}"><span style="display:flex;align-items:center;gap:10px"><i class="dot" style="background:${t.color}"></i>${esc(t.name)}</span><span class="muted">${t.kind}</span></button>`).join('')}
+    ${state.tags.map(t=>`<button class="set-row" data-act="editTag" data-id="${t.id}"><span style="display:flex;align-items:center;gap:10px"><i class="dot" style="background:${col(t.color)}"></i>${esc(t.name)}</span><span class="muted">${t.kind}</span></button>`).join('')}
     <button class="set-row" data-act="newTag"><b>Add a tag</b><span>+</span></button></div></div>
   <div class="set-sec"><h3>Smart tagging</h3><div class="panel"><div class="set-row"><span class="muted">${Object.keys(state.rules||{}).length} learned merchant${Object.keys(state.rules||{}).length===1?'':'s'}</span><button class="btn sm" data-act="rulesReset">Forget all</button></div></div><p class="hint">Tally learns which tag you use for a store and suggests it next time. It also knows common UAE and Egypt stores.</p></div>
   <div class="set-sec"><h3>Data</h3><div class="panel">
@@ -1276,13 +1317,13 @@ function renderSettings(){
   <p class="hint" style="text-align:center;margin:26px 0 8px">Tally version ${APP_VER}</p>`;
 }
 function tagSheet(id){
-  const t=id?tagOf(id):{name:'',color:PALETTE[0],kind:'expense'};
+  const t=id?(state.tags.find(x=>x.id===id)||tagOf(id)):{name:'',color:PALETTE[0],kind:'expense'};
   window.tagForm={id,name:t.name,color:t.color,kind:t.kind};
   const f=window.tagForm;
   openSheet(`<div class="sheet"><div class="sh-head"><button class="cancel" data-act="closeSheet">Cancel</button><b>${id?'Edit tag':'New tag'}</b><button class="save" data-act="saveTag">Save</button></div><div class="sh-body">
     <div class="fld"><label for="tgName">Name</label><input class="in" id="tgName" dir="auto" value="${esc(f.name)}"></div>
     ${id?'':`<div class="fld"><label>Type</label><div class="seg"><button data-act="tagKind" data-v="expense" class="${f.kind==='expense'?'on':''}">Expense</button><button data-act="tagKind" data-v="income" class="${f.kind==='income'?'on':''}">Income</button></div></div>`}
-    <div class="fld"><label>Colour</label><div class="swatches">${PALETTE.map(c=>`<button data-act="tagColor" data-v="${c}" style="background:${c}" class="${c===f.color?'on':''}" aria-label="Colour ${c}"></button>`).join('')}</div></div>
+    <div class="fld"><label>Colour</label><div class="swatches">${PALETTE.map(c=>`<button data-act="tagColor" data-v="${c}" style="background:${col(c)}" class="${c===f.color?'on':''}" aria-label="Colour ${c}"></button>`).join('')}</div></div>
     ${id&&!tagOf(id).builtin?`<button class="btn danger block" data-act="delTag" style="margin-top:24px">Delete tag</button>`:''}
   </div></div>`);
 }
@@ -1332,7 +1373,7 @@ function openForm(id){
   const t=id?state.tx.find(x=>x.id===id):null;
   form=t?{id:t.id,type:t.type,title:t.title,date:t.date,currency:t.currency,total:String(t.total),tagId:t.tagId,note:t.note||'',items:(t.items||[]).map(i=>({...i,amount:String(i.amount)})),fx:t.fx,created:t.created}
         :{id:null,type:'expense',title:'',date:todayStr(),currency:base(),total:'',tagId:'other',note:'',items:[]};
-  form.tagTouched=!!t;form.raw=t?(t.raw||''):'';form.smsOpen=false;form.smsText='';
+  form.tagTouched=!!t;form.raw=t?(t.raw||''):'';form.smsOpen=false;form.smsText='';form.fromTab=ui.tab;
   renderForm();
 }
 const tagOptions=(kind,sel)=>state.tags.filter(t=>t.kind===kind).map(t=>`<option value="${t.id}" ${t.id===sel?'selected':''}>${esc(t.name)}</option>`).join('');
@@ -1391,7 +1432,8 @@ async function saveForm(){
   learnRule(title,f.tagId);items.forEach(i=>{if(i.tagId!==f.tagId)learnRule(i.name,i.tagId);});
   await save();
   ui.month=tx.date.slice(0,7);ui.flash=tx.id;setTimeout(()=>{ui.flash=null;},2200);
-  closeSheet();ui.tab='ledger';render(true);const bn=budgetNote(tx);toast('Saved'+(bn?'. '+bn:''));
+  const back=f.fromTab==='dash'?'dash':'ledger';
+  closeSheet();ui.tab=back;render(true);const bn=budgetNote(tx);toast('Saved'+(bn?'. '+bn:''));
 }
 async function delTx(){
   const t=state.tx.find(x=>x.id===form.id);if(!t)return;
@@ -1628,7 +1670,7 @@ function budgetSheet(){
     <p class="muted">Limits per month in ${base()}. Leave a field empty for no limit.</p>
     <div class="fld"><label for="bTotal">Total spending</label><input class="in num" id="bTotal" inputmode="decimal" data-bud="total" placeholder="No limit" value="${b.total||''}"></div>
     <div class="lbl" style="margin-top:18px">By tag</div>
-    <div class="panel" style="margin-top:8px">${state.tags.filter(t=>t.kind==='expense').map(t=>`<div class="set-row"><span style="display:flex;align-items:center;gap:10px"><i class="dot" style="background:${t.color}"></i>${esc(t.name)}</span><input class="in num" inputmode="decimal" data-bud="${t.id}" placeholder="No limit" value="${b.tags[t.id]||''}"></div>`).join('')}</div></div></div>`);
+    <div class="panel" style="margin-top:8px">${state.tags.filter(t=>t.kind==='expense').map(t=>`<div class="set-row"><span style="display:flex;align-items:center;gap:10px"><i class="dot" style="background:${col(t.color)}"></i>${esc(t.name)}</span><input class="in num" inputmode="decimal" data-bud="${t.id}" placeholder="No limit" value="${b.tags[t.id]||''}"></div>`).join('')}</div></div></div>`);
 }
 function budgetNote(tx){
   if(tx.type!=='expense')return '';
@@ -1728,6 +1770,7 @@ function wInsights(){
   }
   const endEff=R.to>today?today:R.to,elapsed=Math.max(1,daysBetween(R.from,endEff)+1);
   if(DASH.sp>0)lines.push(['note','Average per day',`${nf0.format(DASH.sp/elapsed)} ${base()}`]);
+  if(span>=7&&DASH.sp>0){const busy=new Set(DASH.ex.map(t=>t.date).filter(d=>d<=endEff));lines.push(['note','No-spend days',`${Math.max(0,elapsed-busy.size)} of ${elapsed}`]);}
   if(R.from.slice(0,7)===today.slice(0,7)&&R.to>=today&&span>=28){
     const dim=+lastDay(today.slice(0,7)).slice(8),dn=+today.slice(8);
     if(dn>=3&&DASH.sp>0)lines.push(['note','At this pace the month ends at',`${nf0.format(DASH.sp/dn*dim)} ${base()}`]);
@@ -1755,6 +1798,101 @@ function backupBanner(){
 }
 
 /* =====================================================================
+   MORE WIDGETS
+   ===================================================================== */
+const DEFAULT_ORDER=['summary','budgets','upcoming','insights','line','calendar','donut','top','largest','weekday','currency','days'];
+
+/* ---------- largest expenses ---------- */
+function wLargest(){
+  const rows=[...DASH.ex].sort((a,b)=>inBase(b,b.total)-inBase(a,a.total)).slice(0,5);
+  if(!rows.length)return '';
+  return `<section class="w w-largest"><div class="wh"><h2>Largest expenses</h2></div><div class="panel">${rows.map((t,i)=>{
+    const g=tagOf(t.tagId);
+    return `<button class="row" style="--i:${i}" data-act="edit" data-id="${t.id}"><i class="dot" style="background:${g.color}"></i><span class="rmain"><span class="rt" dir="auto">${esc(t.title)}</span><span class="rs">${fmtD(t.date)}, ${esc(g.name)}</span></span><span class="ramt"><span class="a1">${money(inBase(t,t.total),base())}</span>${t.currency!==base()?`<small>${nf.format(t.total)} ${t.currency}</small>`:''}</span></button>`;}).join('')}</div></section>`;
+}
+
+/* ---------- spending calendar (heatmap) ---------- */
+function wCalendar(){
+  const ym=ui.period==='month'?ui.dMonth:DASH.R.to.slice(0,7);
+  const [y,m]=ym.split('-').map(Number),dim=new Date(y,m,0).getDate(),lead=(new Date(y,m-1,1).getDay()+6)%7;
+  const per=Array(dim+1).fill(0),inc=Array(dim+1).fill(0);
+  state.tx.forEach(t=>{
+    if(!t.date.startsWith(ym))return;
+    const d=+t.date.slice(8);
+    if(t.type==='expense')per[d]+=inBase(t,t.total);else inc[d]+=inBase(t,t.total);
+  });
+  const mx=Math.max(1,...per),today=todayStr();
+  let cells='';
+  for(let i=0;i<lead;i++)cells+='<span class="cal-e"></span>';
+  for(let d=1;d<=dim;d++){
+    const key=ym+'-'+pad(d),v=per[d],a=v>0?Math.round(12+v/mx*70):0;
+    cells+=`<button class="cal-d${key===today?' today':''}${a>52?' hot':''}" style="${v>0?`--a:${a}%`:''}" data-act="calDay" data-key="${key}" aria-label="${esc(dayLabel(key))}: ${nf0.format(v)} ${base()}"><b>${d}</b>${v>0?`<small>${short(v)}</small>`:''}${inc[d]>0?'<i class="cal-inc"></i>':''}</button>`;
+  }
+  const total=per.reduce((s,x)=>s+x,0);
+  return `<section class="w w-calendar"><div class="wh"><h2>Spending calendar</h2><span class="muted" style="font-size:13px">${ymLabel(ym)}</span></div>
+    <div class="cal-h">${['M','T','W','T','F','S','S'].map(x=>`<span>${x}</span>`).join('')}</div><div class="cal-g">${cells}</div>
+    <div class="cal-key"><span>Less</span><i></i><span>More</span><span class="muted" style="margin-left:auto">${nf0.format(total)} ${base()}</span></div></section>`;
+}
+
+/* ---------- coming up: recurring items due soon ---------- */
+function nextDue(r){
+  const t=todayStr(),cur=t.slice(0,7);
+  for(let k=0;k<3;k++){
+    const ym=shiftMonth(cur,k),due=ym+'-'+pad(Math.min(r.day,+lastDay(ym).slice(8)));
+    if(due>t)return due;
+  }
+  return null;
+}
+function wUpcoming(){
+  const t=todayStr(),end=addDays(t,30),list=[];
+  (state.recurring||[]).forEach(r=>{const d=nextDue(r);if(d&&d<=end)list.push({r,d});});
+  list.sort((a,b)=>a.d.localeCompare(b.d));
+  const head=`<div class="wh"><h2>Coming up</h2><button class="btn sm" data-act="newRec">Add</button></div>`;
+  if(!(state.recurring||[]).length)return `<section class="w w-upcoming">${head}<div class="muted">Add rent, salary or subscriptions as recurring items to see what is coming in the next 30 days.</div></section>`;
+  if(!list.length)return `<section class="w w-upcoming">${head}<div class="muted">Nothing is due in the next 30 days.</div></section>`;
+  const sum=type=>list.filter(x=>x.r.type===type).reduce((s,x)=>s+conv(x.r.total,x.r.currency,base()),0),out=sum('expense'),inn=sum('income');
+  return `<section class="w w-upcoming">${head}<div class="muted hintline" style="margin:-4px 0 10px">Next 30 days: ${nf0.format(out)} ${base()} going out${inn?`, ${nf0.format(inn)} coming in`:''}</div><div class="panel">${list.map(({r,d},i)=>{
+    const n=daysBetween(t,d),g=tagOf(r.tagId);
+    return `<button class="row" style="--i:${i}" data-act="editRec" data-id="${r.id}"><i class="dot" style="background:${g.color}"></i><span class="rmain"><span class="rt" dir="auto">${esc(r.title)}</span><span class="rs">${fmtD(d)}, ${n===1?'tomorrow':'in '+n+' days'}</span></span><span class="ramt ${r.type==='income'?'inc':''}"><span class="a1">${r.type==='income'?'+':'\u2212'}${money(r.total,r.currency)}</span></span></button>`;}).join('')}</div></section>`;
+}
+
+/* ---------- spending by weekday ---------- */
+function wWeekday(){
+  const R=DASH.R;
+  if(daysBetween(R.from,R.to)+1<7||!DASH.ex.length)return '';
+  const w=Array(7).fill(0);
+  DASH.ex.forEach(t=>{const [y,m,d]=t.date.split('-').map(Number);w[(new Date(y,m-1,d).getDay()+6)%7]+=inBase(t,t.total);});
+  const mx=Math.max(...w),names=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  return `<section class="w w-weekday"><div class="wh"><h2>By weekday</h2></div><div class="wk">${w.map((v,i)=>`<div class="wk-c"><span class="wk-v">${v>0?short(v):''}</span><div class="wk-b"><i class="${v===mx&&v>0?'top':''}" style="height:${mx?Math.max(v/mx*100,v>0?4:0):0}%"></i></div><span class="wk-l">${names[i]}</span></div>`).join('')}</div></section>`;
+}
+
+/* ---------- spending by currency ---------- */
+function wCurrency(){
+  const m=new Map();
+  DASH.ex.forEach(t=>{const o=m.get(t.currency)||{c:t.currency,orig:0,b:0};o.orig+=t.total;o.b+=inBase(t,t.total);m.set(t.currency,o);});
+  if(m.size<2)return '';
+  const rows=[...m.values()].sort((a,b)=>b.b-a.b),tot=rows.reduce((s,r)=>s+r.b,0);
+  return `<section class="w w-currency"><div class="wh"><h2>By currency</h2></div><div class="rank">${rows.map(r=>`<div class="r"><div class="top"><span class="cc">${r.c}</span><span class="nm muted">${r.c!==base()?nf0.format(r.orig)+' '+r.c:''}</span><span class="amt">${nf0.format(r.b)}</span><span class="cur">${base()}, ${Math.round(r.b/tot*100)}%</span></div><div class="bar"><i style="width:${r.b/tot*100}%;background:var(--ink)"></i></div></div>`).join('')}</div></section>`;
+}
+
+/* =====================================================================
+   DARK MODE: lift the deep tag colours so they read on a dark background
+   ===================================================================== */
+const isDark=()=>{const t=localStorage.getItem('tally.theme')||'system';return t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);};
+function dkColor(hex){
+  if(!/^#[0-9a-f]{6}$/i.test(hex))return hex;
+  const r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;
+  const mx=Math.max(r,g,b),mn=Math.min(r,g,b);
+  let h=0,s=0,l=(mx+mn)/2;
+  if(mx!==mn){const d=mx-mn;s=l>.5?d/(2-mx-mn):d/(mx+mn);h=mx===r?((g-b)/d+(g<b?6:0)):mx===g?((b-r)/d+2):((r-g)/d+4);h/=6;}
+  l=Math.min(.72,Math.max(.6,l+.17));s=Math.min(1,s+.05);
+  const f=(p,q,t)=>{if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p;};
+  const q=l<.5?l*(1+s):l+s-l*s,p=2*l-q,to=x=>Math.round(x*255).toString(16).padStart(2,'0');
+  return '#'+to(f(p,q,h+1/3))+to(f(p,q,h))+to(f(p,q,h-1/3));
+}
+const col=c=>isDark()?dkColor(c):c;
+
+/* =====================================================================
    EVENTS
    ===================================================================== */
 document.addEventListener('click',async e=>{
@@ -1773,6 +1911,7 @@ document.addEventListener('click',async e=>{
     case 'dPrev':if(ui.period==='month')ui.dMonth=shiftMonth(ui.dMonth,-1);else ui.dYear--;render(true);break;
     case 'dNext':if(ui.period==='month')ui.dMonth=shiftMonth(ui.dMonth,1);else ui.dYear++;render(true);break;
     case 'pop':popToggle(a);break;
+    case 'calDay':goLedger({range:{from:d.key,to:d.key,label:dayLabel(d.key)}});break;
     case 'budgets':budgetSheet();break;
     case 'newRec':recSheet(null);break;
     case 'editRec':recSheet(d.id);break;
@@ -1883,6 +2022,12 @@ document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)e.pre
     last=y;
   },{passive:true});
 })();
+const resetScroll=()=>{if(window.scrollY||document.documentElement.scrollTop||document.body.scrollTop)window.scrollTo(0,0);};
+document.addEventListener('focusout',()=>setTimeout(resetScroll,80));
+window.addEventListener('resize',()=>setTimeout(resetScroll,50));
+window.addEventListener('orientationchange',()=>setTimeout(resetScroll,300));
+window.addEventListener('pageshow',()=>setTimeout(resetScroll,100));
+if(window.visualViewport)visualViewport.addEventListener('resize',()=>setTimeout(resetScroll,50));
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden||!state||!key)return;
   const n=runRecurring();
