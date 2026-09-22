@@ -1,7 +1,7 @@
 /* Tally service worker: works offline after the first visit.
    App files are fetched fresh whenever you are online, so updates show up
    immediately. The cached copy is only used when offline. */
-const VER = 'tally-v6';
+const VER = 'tally-v7';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', e => {

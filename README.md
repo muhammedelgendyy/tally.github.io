@@ -13,7 +13,7 @@ Upload all 7 files to the root of your GitHub repo (Add file > Upload files). Ch
 4. First launch: create your username and password.
 
 ## Updating
-Upload the changed files. The app fetches the newest files whenever you are online and reloads itself once when a new version arrives. Settings (bottom) shows the running version: it should say **Tally version 6**.
+Upload the changed files. The app fetches the newest files whenever you are online and reloads itself once when a new version arrives. Settings (bottom) shows the running version: it should say **Tally version 7**.
 
 The home-screen icon is fixed by iOS at the moment you add the app. If it was blank or wrong before, delete the old icon and add the app to the Home Screen again.
 
@@ -33,5 +33,11 @@ The home-screen icon is fixed by iOS at the moment you add the app. If it was bl
 ## If a strip still shows at the bottom of the screen
 1. Open Tally only from its Home Screen icon (not from Safari).
 2. Delete the Home Screen icon, then add the app again (Safari > Share > Add to Home Screen). iOS decides full-screen behaviour when the app is added.
-3. Settings (bottom) should say version 6. If not, swipe the app away and reopen it.
+3. Settings (bottom) should say version 7. If not, swipe the app away and reopen it.
 4. If it is still there, send a screenshot and your iPhone model.
+
+## Forecast tab (new in version 7)
+Build a savings scenario: add money coming in and going out (every month, one time, or between two months), edit any amount right in the list, switch items on and off, and try the What if? sliders. Set your savings today, a yearly return and a goal. Fill it from your last 3 months or your recurring items with one tap.
+
+## Full-screen check
+Settings (bottom) shows a small line such as `Screen 393x852, page 393x793, insets 59px/34px, fix 59px, app`. `fix` is how many pixels Tally adds because iOS reports the page shorter than the screen. If a strip ever shows at the bottom, send that line with a screenshot.
